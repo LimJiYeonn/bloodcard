@@ -1,0 +1,25 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: bloodcard.com
+    Specs:
+      - Hostname: orderer
+
+PeerOrgs:
+  - Name: Blood
+    Domain: blood.bloodcard.com
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+  - Name: Donor
+    Domain: donor.bloodcard.com
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+  - Name: Hospital
+    Domain: hospital.bloodcard.com
+    Template:
+      Count: 2
+    Users:
+      Count: 1

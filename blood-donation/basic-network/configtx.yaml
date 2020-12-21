@@ -1,0 +1,69 @@
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererOrg
+        MSPDir: crypto-config/ordererOrganizations/bloodcard.com/msp
+
+    - &BloodOrg
+        Name: BloodOrg
+        ID: BloodOrg
+        MSPDir: crypto-config/peerOrganizations/blood.bloodcard.com/msp
+        AnchorPeers:
+            - Host: peer0.blood.bloodcard.com
+              Port: 7051
+
+    - &DonorOrg
+        Name: DonorOrg
+        ID: DonorOrg
+        MSPDir: crypto-config/peerOrganizations/donor.bloodcard.com/msp
+        AnchorPeers:
+            - Host: peer0.donor.bloodcard.com
+              Port: 7051
+    - &HospitalOrg
+        Name: HospitalOrg
+        ID: HospitalOrg
+        MSPDir: crypto-config/peerOrganizations/hospital.bloodcard.com/msp
+        AnchorPeers:
+            - Host: peer0.hospital.bloodcard.com
+              Port: 7051
+
+Orderer: &OrdererDefaults
+
+    OrdererType: solo
+    Addresses:
+        -  orderer.bloodcard.com:7050
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+    Organizations:
+
+Application: &ApplicationDefaults
+    Organizations:
+    
+Profiles:
+
+    OrdererGenesis:
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *BloodOrg
+                    - *DonorOrg
+                    - *HospitalOrg
+    Channel1:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *BloodOrg
+                - *DonorOrg
+                - *HospitalOrg

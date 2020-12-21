@@ -1,0 +1,206 @@
+version: '2'
+
+networks:
+  blood:
+
+services:
+  orderer.bloodcard.com:
+    container_name: orderer.bloodcard.com
+    image: hyperledger/fabric-orderer:1.4.3
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererOrg
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    ports:
+      - 7050:7050
+    volumes:
+        - ./config/:/etc/hyperledger/configtx
+        - ./crypto-config/ordererOrganizations/bloodcard.com/orderers/orderer.bloodcard.com/:/etc/hyperledger/msp/orderer
+    networks:
+      - blood
+  peer0.blood.bloodcard.com:
+    container_name: peer0.blood.bloodcard.com
+    image: hyperledger/fabric-peer:1.4.3
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer0.blood.bloodcard.com
+      - CORE_LOGGING_PEER=debug
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_LOCALMSPID=BloodOrg
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer0.blood.bloodcard.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.blood.bloodcard.com:7051
+      - CORE_PEER_GOSSIP_ENDPOINT=peer0.blood.bloodcard.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.blood.bloodcard.com:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_blood
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 7051:7051
+      - 7053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/blood.bloodcard.com/peers/peer0.blood.bloodcard.com/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/blood.bloodcard.com/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.bloodcard.com
+    networks:
+      - blood
+  peer1.blood.bloodcard.com:
+    container_name: peer1.blood.bloodcard.com
+    image: hyperledger/fabric-peer:1.4.3
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer1.blood.bloodcard.com
+      - CORE_LOGGING_PEER=debug
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_LOCALMSPID=BloodOrg
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer1.blood.bloodcard.com:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_blood
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 8051:7051
+      - 8053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/blood.bloodcard.com/peers/peer1.blood.bloodcard.com/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/blood.bloodcard.com/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.bloodcard.com
+    networks:
+      - blood
+  peer0.donor.bloodcard.com:
+    container_name: peer0.donor.bloodcard.com
+    image: hyperledger/fabric-peer:1.4.3
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer0.donor.bloodcard.com
+      - CORE_LOGGING_PEER=debug
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_LOCALMSPID=DonorOrg
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer0.donor.bloodcard.com:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_blood
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 9051:7051
+      - 9053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/donor.bloodcard.com/peers/peer0.donor.bloodcard.com/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/donor.bloodcard.com/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.bloodcard.com
+    networks:
+      - blood
+  peer1.donor.bloodcard.com:
+    container_name: peer1.donor.bloodcard.com
+    image: hyperledger/fabric-peer:1.4.3
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer1.donor.bloodcard.com
+      - CORE_LOGGING_PEER=debug
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_LOCALMSPID=DonorOrg
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer1.donor.bloodcard.com:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_blood
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 10051:7051
+      - 10053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/donor.bloodcard.com/peers/peer1.donor.bloodcard.com/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/donor.bloodcard.com/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.bloodcard.com
+    networks:
+      - blood
+  peer0.hospital.bloodcard.com:
+    container_name: peer0.hospital.bloodcard.com
+    image: hyperledger/fabric-peer:1.4.3
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer0.hospital.bloodcard.com
+      - CORE_LOGGING_PEER=debug
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_LOCALMSPID=HospitalOrg
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer0.hospital.bloodcard.com:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_blood
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 11051:7051
+      - 11053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/hospital.bloodcard.com/peers/peer0.hospital.bloodcard.com/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/hospital.bloodcard.com/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.bloodcard.com
+    networks:
+      - blood
+  peer1.hospital.bloodcard.com:
+    container_name: peer1.hospital.bloodcard.com
+    image: hyperledger/fabric-peer:1.4.3
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=peer1.hospital.bloodcard.com
+      - CORE_LOGGING_PEER=debug
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_LOCALMSPID=HospitalOrg
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/
+      - CORE_PEER_ADDRESS=peer1.hospital.bloodcard.com:7051
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_blood
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: peer node start
+    ports:
+      - 12051:7051
+      - 12053:7053
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./crypto-config/peerOrganizations/hospital.bloodcard.com/peers/peer1.hospital.bloodcard.com/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/hospital.bloodcard.com/users:/etc/hyperledger/msp/users
+        - ./config:/etc/hyperledger/configtx
+    depends_on:
+      - orderer.bloodcard.com
+    networks:
+      - blood
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.blood.bloodcard.com:7051
+      - CORE_PEER_LOCALMSPID=BloodOrg
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/blood.bloodcard.com/users/Admin@blood.bloodcard.com/msp
+      - CORE_CHAINCODE_KEEPALIVE=10
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./../chaincode/:/opt/gopath/src/chaincode/
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./config:/etc/hyperledger/configtx
+    networks:
+        - blood

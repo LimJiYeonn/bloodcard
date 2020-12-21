@@ -1,0 +1,41 @@
+
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '2.0.3'
+}
+
+group 'blood_1'
+version '1.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repository.mulesoft.org/nexus/content/repositories/public/"
+    }
+}
+//repositories {
+//    marven {
+//        url "https://nexus.hyperledger.org/content/repositories/snapshots/"
+//    }
+//    jcenter()
+//    marven {
+//        url 'https://jitpack.io'
+//    }
+//}
+
+dependencies {
+    compile group: 'org.hyperledger.fabric-chaincode-java', name: 'fabric-chaincode-shim', version: '1.+'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+shadowJar{
+    baseName = 'chaincode'
+    version = null
+    classifier = null
+
+    manifest {
+        attributes 'Main-class' : 'org.hyperledger.fabric.chaincode.blood_1'
+    }
+}
